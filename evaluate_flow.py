@@ -10,6 +10,7 @@ from glob import glob
 @torch.no_grad()
 def flow_unimatch( image1,
                    image2,
+                   resume='pretrained/gmflow-scale2-regrefine6-mixdata-train320x576-4e7b215d.pth',
                    inference_dir='task_1_2_2/unimatch',
                    padding_factor=32,
                    upsample_factor=4,
@@ -46,6 +47,15 @@ def flow_unimatch( image1,
                      reg_refine=reg_refine,
                      task='flow').to(device)
     print(model)
+
+    if resume:
+        print('Load checkpoint: %s' % resume)
+
+        loc = 'cuda:{}'.format(0) if torch.cuda.is_available() else 'cpu'
+        checkpoint = torch.load(resume, map_location=loc)
+
+        model.load_state_dict(checkpoint['model'], strict=True)
+
     model.eval()
 
     num_params = sum(p.numel() for p in model.parameters())
