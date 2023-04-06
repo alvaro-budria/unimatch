@@ -10,7 +10,7 @@ from glob import glob
 @torch.no_grad()
 def flow_unimatch( image1,
                    image2,
-                   inference_dir,
+                   inference_dir='task_1_2_2/unimatch',
                    padding_factor=32,
                    upsample_factor=4,
                    feature_channels=128,
