@@ -7,6 +7,43 @@ from unimatch.unimatch import UniMatch
 from glob import glob
 
 
+def setup_model(
+    resume='pretrained/gmflow-scale2-regrefine6-mixdata-train320x576-4e7b215d.pth',
+    upsample_factor=4,
+    feature_channels=128,
+    num_scales=2,
+    reg_refine=True,
+    num_head=1,
+    ffn_dim_expansion=4,
+    num_transformer_layers=6,
+    device='cuda',
+    ):
+    model = UniMatch(
+        feature_channels=feature_channels,
+        num_scales=num_scales,
+        upsample_factor=upsample_factor,
+        num_head=num_head,
+        ffn_dim_expansion=ffn_dim_expansion,
+        num_transformer_layers=num_transformer_layers,
+        reg_refine=reg_refine,
+        task='flow').to(device)
+    print(model)
+
+    if resume:
+        print('Load checkpoint: %s' % resume)
+
+        loc = 'cuda:{}'.format(0) if torch.cuda.is_available() else 'cpu'
+        checkpoint = torch.load(resume, map_location=loc)
+
+        model.load_state_dict(checkpoint['model'], strict=True)
+
+    model.eval()
+
+    num_params = sum(p.numel() for p in model.parameters())
+    print('Number of params:', num_params)
+    return model
+
+
 @torch.no_grad()
 def flow_unimatch( image1,
                    image2,
@@ -37,31 +74,8 @@ def flow_unimatch( image1,
 
     torch.backends.cudnn.benchmark = True
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    model = UniMatch(feature_channels=feature_channels,
-                     num_scales=num_scales,
-                     upsample_factor=upsample_factor,
-                     num_head=num_head,
-                     ffn_dim_expansion=ffn_dim_expansion,
-                     num_transformer_layers=num_transformer_layers,
-                     reg_refine=reg_refine,
-                     task='flow').to(device)
-    print(model)
-
-    if resume:
-        print('Load checkpoint: %s' % resume)
-
-        loc = 'cuda:{}'.format(0) if torch.cuda.is_available() else 'cpu'
-        checkpoint = torch.load(resume, map_location=loc)
-
-        model.load_state_dict(checkpoint['model'], strict=True)
-
-    model.eval()
-
-    num_params = sum(p.numel() for p in model.parameters())
-    print('Number of params:', num_params)
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = setup_model(resume, upsample_factor, feature_channels, num_scales, reg_refine,
+                        num_head, ffn_dim_expansion, num_transformer_layers, device)
 
     fixed_inference_size = inference_size
     transpose_img = False
