@@ -4,13 +4,14 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from dataloader.flow.datasets import FlyingChairs, FlyingThings3D, MpiSintel, KITTI
+import sys
+sys.path.insert(0,'./unimatch')
+
 from utils import frame_utils
 from utils.flow_viz import save_vis_flow_tofile, flow_to_image
 import imageio
 
 from unimatch.unimatch import UniMatch
-from utils.utils import InputPadder, compute_out_of_boundary_mask
 from glob import glob
 from unimatch.geometry import forward_backward_consistency_check
 from utils.file_io import extract_video
@@ -185,14 +186,14 @@ def inference_flow(model,
                    inference_dir,
                    inference_video=None,
                    output_path='output',
-                   padding_factor=8,
+                   padding_factor=32,
                    inference_size=None,
                    save_flo_flow=False,  # save raw flow prediction as .flo
                    attn_type='swin',
-                   attn_splits_list=None,
-                   corr_radius_list=None,
-                   prop_radius_list=None,
-                   num_reg_refine=1,
+                   attn_splits_list=[2,8],
+                   corr_radius_list=[-1,4],
+                   prop_radius_list=[-1,1],
+                   num_reg_refine=6,
                    pred_bidir_flow=False,
                    pred_bwd_flow=False,
                    fwd_bwd_consistency_check=False,
