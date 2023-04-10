@@ -3,12 +3,13 @@ import os
 import numpy as np
 import torch
 import torch.nn.functional as F
+import cv2
 
 import sys
 sys.path.insert(0,'./unimatch')
 
 from utils import frame_utils
-from utils.flow_viz import save_vis_flow_tofile, flow_to_image
+from utils.flow_viz import save_vis_flow_tofile, flow_to_image, convert_image_to_optical_flow
 import imageio
 
 from unimatch.unimatch import UniMatch
@@ -37,7 +38,6 @@ def setup_model(
         num_transformer_layers=num_transformer_layers,
         reg_refine=reg_refine,
         task='flow').to(device)
-    print(model)
 
     if resume:
         print('Load checkpoint: %s' % resume)
@@ -308,10 +308,13 @@ def inference_flow(model,
             output_file = os.path.join(output_path, os.path.basename(filenames[test_id])[:-4] + '_flow.png')
 
         if inference_video is not None and save_video:
-            vis_flow_preds.append(flow_to_image(flow))
+            # vis_flow_preds.append(flow_to_image(flow))
+            vis_flow_preds.append(convert_image_to_optical_flow(pred_flow))
         else:
             # save vis flow
-            save_vis_flow_tofile(flow, output_file)
+            # save_vis_flow_tofile(flow, output_file)
+            pred_flow = convert_image_to_optical_flow(pred_flow)
+            cv2.imwrite(output_file, pred_flow)
 
         # also predict backward flow
         if pred_bidir_flow:
@@ -324,7 +327,9 @@ def inference_flow(model,
                 output_file = os.path.join(output_path, os.path.basename(filenames[test_id])[:-4] + '_flow_bwd.png')
 
             # save vis flow
-            save_vis_flow_tofile(flow_bwd, output_file)
+            # save_vis_flow_tofile(flow_bwd, output_file)
+            pred_flow = convert_image_to_optical_flow(pred_flow)
+            cv2.imwrite(output_file, pred_flow)
 
             # forward-backward consistency check
             # occlusion is 1

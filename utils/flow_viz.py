@@ -280,6 +280,19 @@ def save_vis_flow_tofile(flow, output_path):
     Image.fromarray(vis_flow).save(output_path)
 
 
+def convert_image_to_optical_flow(flow: np.ndarray) -> np.ndarray:
+    img_u = flow[:, :, 0]
+    img_v = flow[:, :, 1]
+    img_available = flow[:, :, 2]
+
+    img_u = (img_u * 64 + 2 ** 15).astype(np.uint16)
+    img_v = (img_v * 64 + 2 ** 15).astype(np.uint16)
+    img_available = img_available.astype(np.uint16)
+
+    optical_flow = np.dstack((img_available, img_v, img_u))
+    return optical_flow
+
+
 def flow_tensor_to_image(flow):
     """Used for tensorboard visualization"""
     flow = flow.permute(1, 2, 0)  # [H, W, 2]
