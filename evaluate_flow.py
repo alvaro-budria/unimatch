@@ -309,12 +309,12 @@ def inference_flow(model,
 
         if inference_video is not None and save_video:
             # vis_flow_preds.append(flow_to_image(flow))
-            pred_flow = np.stack((flow[...,0], flow[...,1], np.ones_like(flow_bwd[...,0])), axis=2)
+            pred_flow = np.stack((flow[...,0], flow[...,1], np.ones_like(flow[...,0])), axis=2)
             vis_flow_preds.append(convert_image_to_optical_flow(pred_flow))
         else:
             # save vis flow
             # save_vis_flow_tofile(flow, output_file)
-            pred_flow = np.stack((flow[...,0], flow[...,1], np.ones_like(flow_bwd[...,0])), axis=2)
+            pred_flow = np.stack((flow[...,0], flow[...,1], np.ones_like(flow[...,0])), axis=2)
             pred_flow = convert_image_to_optical_flow(pred_flow)
             cv2.imwrite(output_file, pred_flow)
 
