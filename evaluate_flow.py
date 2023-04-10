@@ -42,7 +42,8 @@ def setup_model(
     if resume:
         print('Load checkpoint: %s' % resume)
 
-        loc = 'cuda:{}'.format(0) if torch.cuda.is_available() else 'cpu'
+        # loc = 'cuda:{}'.format(0) if torch.cuda.is_available() else 'cpu'
+        loc = 'cuda' if torch.cuda.is_available() else 'cpu'
         checkpoint = torch.load(resume, map_location=loc)
 
         model.load_state_dict(checkpoint['model'], strict=True)
