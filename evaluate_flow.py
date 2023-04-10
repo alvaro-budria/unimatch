@@ -309,11 +309,11 @@ def inference_flow(model,
 
         if inference_video is not None and save_video:
             # vis_flow_preds.append(flow_to_image(flow))
-            vis_flow_preds.append(convert_image_to_optical_flow(pred_flow))
+            vis_flow_preds.append(convert_image_to_optical_flow(flow))
         else:
             # save vis flow
             # save_vis_flow_tofile(flow, output_file)
-            pred_flow = convert_image_to_optical_flow(pred_flow)
+            pred_flow = convert_image_to_optical_flow(flow)
             cv2.imwrite(output_file, pred_flow)
 
         # also predict backward flow
@@ -328,7 +328,7 @@ def inference_flow(model,
 
             # save vis flow
             # save_vis_flow_tofile(flow_bwd, output_file)
-            pred_flow = convert_image_to_optical_flow(pred_flow)
+            pred_flow = convert_image_to_optical_flow(flow_bwd)
             cv2.imwrite(output_file, pred_flow)
 
             # forward-backward consistency check
